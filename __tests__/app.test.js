@@ -3,6 +3,7 @@ const app = require("../app.js");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
+const allEndPoints = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(testData);
@@ -10,6 +11,17 @@ beforeEach(() => {
 
 afterAll(() => {
   return db.end();
+});
+
+describe("GET /api", () => {
+  test("Status 200 - responds with JSON describing all available endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.endpoints).toEqual(allEndPoints);
+      });
+  });
 });
 
 describe("Get /api/topics", () => {
