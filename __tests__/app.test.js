@@ -25,6 +25,9 @@ describe("Get /api/topics", () => {
         });
       });
   });
+});
+
+describe("GET /unavailable-endpoint", () => {
   test("Status 404 - responds with unavailable endpoint requested", () => {
     return request(app).get("/api/not-an-endpoint").expect(404);
   });
