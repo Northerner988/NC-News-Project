@@ -1,11 +1,27 @@
-Instructions
+# Setup Instructions
 
-1️⃣ In order to successfully connect to the databases locally, you must setup the necessary environment variables.
+In order to successfully connect to the databases locally, you must setup the necessary environment variables.
 
--Create two files in the root directory: .env.test and .env.development.
+### 1.
 
--The files contents should be formatted as follows:
-Test file: PGDATABASE=database_name_here_test
-Development file: PGDATABASE=database_name_here
+Create two files in the root directory:
 
--Replace database_name_here with the name of the database you are connecting to, this information can be found in the setup.sql file.
+`.env.test`
+
+`.env.development`
+
+### 2.
+
+The contents of files should be formatted as follows:
+
+For the **test** file
+
+```
+PGDATABASE=nc_news_test
+```
+
+For the **development** file
+
+```
+PGDATABASE=nc_news
+```
