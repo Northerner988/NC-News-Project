@@ -92,6 +92,7 @@ describe("Get /api/articles", () => {
         expect(articles).toBeSortedBy("created_at", {
           descending: true,
         });
+
         body.articles.forEach((article) => {
           expect(typeof article.author).toBe("string");
           expect(typeof article.title).toBe("string");
@@ -101,6 +102,7 @@ describe("Get /api/articles", () => {
           expect(typeof article.votes).toBe("number");
           expect(typeof article.article_img_url).toBe("string");
           expect(typeof article.comment_count).toBe("number");
+          expect(articles.body).toBe(undefined);
         });
       });
   });
