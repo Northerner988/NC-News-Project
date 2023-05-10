@@ -93,7 +93,6 @@ describe("Get /api/articles", () => {
           descending: true,
         });
         body.articles.forEach((article) => {
-          console.log(article.comment_count);
           expect(typeof article.author).toBe("string");
           expect(typeof article.title).toBe("string");
           expect(typeof article.article_id).toBe("number");
