@@ -44,3 +44,38 @@ describe("GET /unavailable-endpoint", () => {
     return request(app).get("/api/not-an-endpoint").expect(404);
   });
 });
+
+describe("GET/articles/:article_id", () => {
+  test("Status 200 - responds with the specified article object", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article.article_id).toBe(1);
+        expect(article.title).toBe("Living in the shadow of a great man");
+        expect(article.topic).toBe("mitch");
+        expect(article.author).toBe("butter_bridge");
+        expect(article.body).toBe("I find this existence challenging");
+        expect(article.created_at).toBe("2020-07-09T20:11:00.000Z");
+        expect(article.votes).toBe(100);
+        expect(article.article_img_url).toBe(
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        );
+      });
+  });
+  test("Status 400 - invalid article ID ", () => {
+    return request(app)
+      .get("/api/articles/25Al")
+      .expect(400)
+      .then(({ body }) => expect(body.msg).toBe("Bad request - ID is invalid"));
+  });
+  test("Status 404 - valid but non-existent article ID", () => {
+    return request(app)
+      .get("/api/articles/99999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("ID not found");
+      });
+  });
+});
