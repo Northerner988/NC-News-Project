@@ -4,7 +4,7 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const allEndPoints = require("../endpoints.json");
-const { toBeSortBy } = require("jest-sorted");
+require("jest-sorted");
 
 beforeEach(() => {
   return seed(testData);
@@ -89,7 +89,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .then((response) => {
         const { comments } = response.body;
         expect(comments.length).toBe(2);
-        expect(comments).toBeSorted({ key: "created_at", descending: true });
+        expect(comments).toBeSortedBy("created_at", { descending: true });
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
