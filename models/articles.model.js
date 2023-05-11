@@ -1,5 +1,7 @@
 const db = require("../db/connection");
 
+const { checkArticleExists } = require("../db/seeds/utils");
+
 exports.fetchArticleById = (articleId) => {
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1`, [articleId])
@@ -13,6 +15,17 @@ exports.fetchArticleById = (articleId) => {
       return result.rows[0];
     });
 };
+
+
+exports.fetchCommentsById = (article_id) => {
+  return checkArticleExists(article_id)
+    .then(() => {
+      return db.query(
+        `SELECT * FROM comments WHERE article_id = $1
+    ORDER BY created_at DESC; `,
+        [article_id]
+      );
+    })
 
 exports.fetchAllArticles = () => {
   return db
