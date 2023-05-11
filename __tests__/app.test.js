@@ -115,4 +115,12 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => expect(body.msg).toBe("Bad request - ID is invalid"));
   });
+  test("Status 404 - valid but non-existent article ID", () => {
+    return request(app)
+      .get("/api/articles/99999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
+  });
 });
