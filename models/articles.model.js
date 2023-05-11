@@ -16,17 +16,6 @@ exports.fetchArticleById = (articleId) => {
     });
 };
 
-
-exports.fetchCommentsById = (article_id) => {
-  return checkArticleExists(article_id)
-    .then(() => {
-      return db.query(
-        `SELECT * FROM comments WHERE article_id = $1
-    ORDER BY created_at DESC; `,
-        [article_id]
-      );
-    })
-
 exports.fetchAllArticles = () => {
   return db
     .query(
@@ -44,6 +33,20 @@ exports.fetchAllArticles = () => {
   GROUP BY articles.article_id
   ORDER BY articles.created_at DESC;`
     )
+    .then((result) => {
+      return result.rows;
+    });
+};
+
+exports.fetchCommentsById = (article_id) => {
+  return checkArticleExists(article_id)
+    .then(() => {
+      return db.query(
+        `SELECT * FROM comments WHERE article_id = $1
+    ORDER BY created_at DESC; `,
+        [article_id]
+      );
+    })
     .then((result) => {
       return result.rows;
     });
