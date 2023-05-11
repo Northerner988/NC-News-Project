@@ -4,7 +4,7 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const allEndPoints = require("../endpoints.json");
-const { sortBy } = require("jest-sorted");
+const { toBeSortBy } = require("jest-sorted");
 
 beforeEach(() => {
   return seed(testData);
@@ -91,11 +91,18 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(comments.length).toBe(2);
         expect(comments).toBeSorted({ key: "created_at", descending: true });
         comments.forEach((comment) => {
-          expect(typeof comment.comment_id).toBe("number");
-          expect(typeof comment.votes).toBe("number");
-          expect(typeof comment.created_at).toBe("string");
-          expect(typeof comment.body).toBe("string");
-          expect(typeof comment.article_id).toBe("number");
+          // expect(typeof comment.comment_id).toBe("number");
+          // expect(typeof comment.votes).toBe("number");
+          // expect(typeof comment.created_at).toBe("string");
+          // expect(typeof comment.body).toBe("string");
+          // expect(typeof comment.article_id).toBe("number");
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
         });
       });
   });
