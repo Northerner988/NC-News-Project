@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const allEndPoints = require("../endpoints.json");
+const { sortBy } = require("jest-sorted");
 
 beforeEach(() => {
   return seed(testData);
@@ -45,7 +46,7 @@ describe("GET /unavailable-endpoint", () => {
   });
 });
 
-describe("GET/articles/:article_id", () => {
+describe("GET /api/articles/:article_id", () => {
   test("Status 200 - responds with the specified article object", () => {
     return request(app)
       .get("/api/articles/1")
@@ -76,6 +77,26 @@ describe("GET/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("ID not found");
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("Status 200 - responds with the comments corresponding to the specified article, sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then((response) => {
+        const { comments } = response.body;
+        expect(comments.length).toBe(2);
+        expect(comments).toBeSorted({ key: "created_at", descending: true });
+        comments.forEach((comment) => {
+          expect(typeof comment.comment_id).toBe("number");
+          expect(typeof comment.votes).toBe("number");
+          expect(typeof comment.created_at).toBe("string");
+          expect(typeof comment.body).toBe("string");
+          expect(typeof comment.article_id).toBe("number");
+        });
       });
   });
 });
