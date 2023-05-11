@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const allEndPoints = require("../endpoints.json");
+const toBeSortedBy = require("jest-sorted");
 
 beforeEach(() => {
   return seed(testData);
@@ -91,17 +92,19 @@ describe("Get /api/articles", () => {
         expect(articles).toBeSortedBy("created_at", {
           descending: true,
         });
-
         body.articles.forEach((article) => {
-          expect(typeof article.author).toBe("string");
-          expect(typeof article.title).toBe("string");
-          expect(typeof article.article_id).toBe("number");
-          expect(typeof article.topic).toBe("string");
-          expect(typeof article.created_at).toBe("string");
-          expect(typeof article.votes).toBe("number");
-          expect(typeof article.article_img_url).toBe("string");
-          expect(typeof article.comment_count).toBe("number");
-          expect(articles.body).toBe(undefined);
+          expect(article.body).toBe(undefined);
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
         });
       });
   });
