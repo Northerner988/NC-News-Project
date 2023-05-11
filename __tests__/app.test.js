@@ -99,4 +99,20 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
       });
   });
+  test("Status 200 - responds with an empty array for article that has no comments", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then((response) => {
+        const { comments } = response.body;
+        expect(comments).toEqual([]);
+      });
+  });
+
+  test("Status 400 - invalid article ID ", () => {
+    return request(app)
+      .get("/api/articles/25Nonsense/comments")
+      .expect(400)
+      .then(({ body }) => expect(body.msg).toBe("Bad request - ID is invalid"));
+  });
 });
