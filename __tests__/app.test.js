@@ -82,7 +82,7 @@ describe("GET/articles/:article_id", () => {
 });
 
 describe("Get /api/articles", () => {
-  test("Status 200 - responds with an array of all the article objects ", () => {
+  test("Status 200 - responds with an array of all the article objects sorted by date in descending order. ", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
