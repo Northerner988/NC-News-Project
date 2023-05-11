@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const allEndPoints = require("../endpoints.json");
+const toBeSortedBy = require("jest-sorted");
 
 beforeEach(() => {
   return seed(testData);
@@ -76,6 +77,35 @@ describe("GET/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("ID not found");
+      });
+  });
+});
+
+describe("Get /api/articles", () => {
+  test("Status 200 - responds with an array of all the article objects sorted by date in descending order. ", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(12);
+        expect(articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+        body.articles.forEach((article) => {
+          expect(article.body).toBe(undefined);
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
       });
   });
 });
