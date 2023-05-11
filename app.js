@@ -1,8 +1,8 @@
 const express = require("express");
 const { getAllTopics } = require("./controllers/topics.controller");
 const {
-  getArticleById,
   getCommentsById,
+  getAllArticles,
 } = require("./controllers/articles.controller");
 const getAllEndpoints = require("./controllers/api-endpoints-controller");
 const app = express();
@@ -14,6 +14,8 @@ app.get("/api/topics", getAllTopics);
 app.get("/api/articles/:article_id", getArticleById);
 
 app.get("/api/articles/:article_id/comments", getCommentsById);
+
+app.get("/api/articles", getAllArticles);
 
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });

@@ -6,6 +6,7 @@ const seed = require("../db/seeds/seed.js");
 const allEndPoints = require("../endpoints.json");
 require("jest-sorted");
 
+
 beforeEach(() => {
   return seed(testData);
 });
@@ -82,47 +83,48 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
-  test("Status 200 - responds with the comments corresponding to the specified article, sorted by date in descending order", () => {
-    return request(app)
-      .get("/api/articles/3/comments")
-      .expect(200)
-      .then((response) => {
-        const { comments } = response.body;
-        expect(comments.length).toBe(2);
-        expect(comments).toBeSortedBy("created_at", { descending: true });
-        comments.forEach((comment) => {
-          expect(comment).toMatchObject({
-            comment_id: expect.any(Number),
-            votes: expect.any(Number),
-            created_at: expect.any(String),
-            body: expect.any(String),
-            article_id: expect.any(Number),
-          });
-        });
-      });
-  });
-  test("Status 200 - responds with an empty array for article that has no comments", () => {
-    return request(app)
-      .get("/api/articles/2/comments")
-      .expect(200)
-      .then((response) => {
-        const { comments } = response.body;
-        expect(comments).toEqual([]);
-      });
-  });
+    test("Status 200 - responds with the comments corresponding to the specified article, sorted by date in descending order", () => {
+        return request(app)
+            .get("/api/articles/3/comments")
+            .expect(200)
+            .then((response) => {
+                const { comments } = response.body;
+                expect(comments.length).toBe(2);
+                expect(comments).toBeSortedBy("created_at", { descending: true });
+                comments.forEach((comment) => {
+                    expect(comment).toMatchObject({
+                        comment_id: expect.any(Number),
+                        votes: expect.any(Number),
+                        created_at: expect.any(String),
+                        body: expect.any(String),
+                        article_id: expect.any(Number),
+                    })
+                })
+            });
+    });
+    test("Status 200 - responds with an empty array for article that has no comments", () => {
+        return request(app)
+            .get("/api/articles/2/comments")
+            .expect(200)
+            .then((response) => {
+                const { comments } = response.body;
+                expect(comments).toEqual([]);
+            });
+    });
 
-  test("Status 400 - invalid article ID ", () => {
-    return request(app)
-      .get("/api/articles/25Nonsense/comments")
-      .expect(400)
-      .then(({ body }) => expect(body.msg).toBe("Bad request - ID is invalid"));
-  });
-  test("Status 404 - valid but non-existent article ID", () => {
-    return request(app)
-      .get("/api/articles/99999/comments")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Article not found");
-      });
-  });
+    test("Status 400 - invalid article ID ", () => {
+        return request(app)
+            .get("/api/articles/25Nonsense/comments")
+            .expect(400)
+            .then(({ body }) => expect(body.msg).toBe("Bad request - ID is invalid"));
+    });
+    test("Status 404 - valid but non-existent article ID", () => {
+        return request(app)
+            .get("/api/articles/99999/comments")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Article not found");
+            });
+    });
+    
 });
