@@ -53,7 +53,8 @@
         "body": "Text from the article..",
         "created_at": "2023-05-09T20:11:00.000Z",
         "votes": 17,
-        "comment_count": 10
+        "comment_count": 10,
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
       }
     }
   },
@@ -96,6 +97,25 @@
         "votes": 0,
         "created_at": "2020-05-14T04:15:00.000Z",
         "body": "Just another day in the life of a software developer"
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "Updates the votes of the given article.",
+    "queries": [],
+    "exampleRequest": {
+      "inc_votes": 3
+    },
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Day in the life of a software developer",
+        "body": "Today i learned about sql, and how to use it to query databases",
+        "votes": 3,
+        "topic": "IT",
+        "author": "Al98",
+        "created_at": "2023-05-09T20:11:00.000Z",
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
       }
     }
   }
