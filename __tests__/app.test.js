@@ -272,13 +272,23 @@ describe("Post /api/articles/:article_id/comments", () => {
 
 describe("PATCH /api/comments/:comment_id", () => {
   const newVote = { inc_votes: 20 };
-  test("Status 200 - updates the given articles' votes and returns it", () => {
+  test.only("Status 200 - updates the given articles' votes and returns it", () => {
     return request(app)
       .patch("/api/articles/1")
       .send(newVote)
       .expect(200)
       .then(({ body }) => {
-        expect(body.article.votes).toBe(120);
+        expect(body.article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          body: "I find this existence challenging",
+          votes: 120,
+          topic: "mitch",
+          author: "butter_bridge",
+          created_at: expect.any(String),
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
       });
   });
   test("Status 400 - incomplete request body ", () => {
