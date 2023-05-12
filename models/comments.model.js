@@ -1,0 +1,11 @@
+const db = require("../db/connection");
+
+exports.insertCommentById = (article_id, username, body) => {
+  const queryStr = `INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`;
+
+  const queryValues = [article_id, username, body];
+
+  return db.query(queryStr, queryValues).then((result) => {
+    return result.rows[0];
+  });
+};
