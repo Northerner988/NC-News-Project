@@ -10,7 +10,6 @@ const getAllEndpoints = require("./controllers/api-endpoints-controller");
 const app = express();
 
 const { postCommentById } = require("./controllers/comments.controller");
-const e = require("express");
 
 app.use(express.json());
 
