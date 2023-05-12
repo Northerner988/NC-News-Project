@@ -177,6 +177,28 @@ describe("Post /api/articles/:article_id/comments", () => {
         });
       });
   });
+  test("Status 201 - addition of extra properties in post body are ignored ", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "Just another random comment.",
+      extra: "This property will be ignored",
+      anotherExtra: "This property will also be ignored",
+    };
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual({
+          article_id: 3,
+          author: "butter_bridge",
+          body: "Just another random comment.",
+          comment_id: 19,
+          created_at: expect.any(String),
+          votes: 0,
+        });
+      });
+  });
   test("Status 400 - missing properties from post body ", () => {
     const newComment = {
       username: "butter_bridge",
