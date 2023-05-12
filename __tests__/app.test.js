@@ -272,7 +272,7 @@ describe("Post /api/articles/:article_id/comments", () => {
 
 describe("PATCH /api/comments/:comment_id", () => {
   const newVote = { inc_votes: 20 };
-  test.only("Status 200 - updates the given articles' votes and returns it", () => {
+  test("Status 200 - updates the given articles' votes and returns it", () => {
     return request(app)
       .patch("/api/articles/1")
       .send(newVote)
