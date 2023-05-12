@@ -4,6 +4,7 @@ const {
   getCommentsById,
   getAllArticles,
   getArticleById,
+  patchArticlesVotes,
 } = require("./controllers/articles.controller");
 
 const getAllEndpoints = require("./controllers/api-endpoints-controller");
@@ -25,13 +26,15 @@ app.get("/api/articles/:article_id/comments", getCommentsById);
 
 app.post("/api/articles/:article_id/comments", postCommentById);
 
+app.patch("/api/articles/:article_id", patchArticlesVotes);
+
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });
 });
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
-    res.status(400).send({ msg: "Bad request - ID is invalid" });
+    res.status(400).send({ msg: "Bad request - Invalid input data type" });
   } else if (err.code === "23502") {
     res.status(400).send({ msg: "Invalid post body" });
   } else if (err.code === "23503") {
