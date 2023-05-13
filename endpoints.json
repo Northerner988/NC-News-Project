@@ -14,6 +14,24 @@
       ]
     }
   },
+  "GET /api/users": {
+    "description": "Serves an array of all users.",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "butter_bean",
+          "name": "Ben",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        },
+        {
+          "username": "jerry_vamp",
+          "name": "jerry",
+          "avatar_url": "https://avatars5.githubusercontent.com/u/24394918?s=400&v=4"
+        }
+      ]
+    }
+  },
   "GET /api/articles": {
     "description": "Serves an array of all articles.",
     "queries": [],
