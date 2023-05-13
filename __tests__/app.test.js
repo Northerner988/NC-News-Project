@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const allEndPoints = require("../endpoints.json");
+const users = require("../db/data/test-data/users.js");
 require("jest-sorted");
 
 beforeEach(() => {
@@ -44,6 +45,26 @@ describe("Get /api/topics", () => {
           expect(topic).toMatchObject({
             description: expect.any(String),
             slug: expect.any(String),
+          });
+        });
+      });
+  });
+});
+
+describe("GET /api/users", () => {
+  test("STATUS 200: responds with an array of all the users objects ", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toBeInstanceOf(Array);
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
           });
         });
       });
@@ -356,28 +377,6 @@ describe("PATCH /api/comments/:comment_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("ID not found");
-      });
-  });
-  //****************************************************** */
-  test.skip("STATUS 200: returns unchanged article if no votes value has been provided", () => {
-    const newVote = {};
-    return request(app)
-      .patch("/api/articles/1")
-      .send(newVote)
-      .expect(400)
-      .then(({ body }) => {
-        console.log(body);
-        expect(body.article).toEqual({
-          article_id: 1,
-          title: "Living in the shadow of a great man",
-          body: "I find this existence challenging",
-          votes: 100,
-          topic: "mitch",
-          author: "butter_bridge",
-          created_at: expect.any(String),
-          article_img_url:
-            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-        });
       });
   });
 });
