@@ -10,7 +10,10 @@ const {
 const getAllEndpoints = require("./controllers/api-endpoints-controller");
 const app = express();
 
-const { postCommentById } = require("./controllers/comments.controller");
+const {
+  postCommentById,
+  deleteCommentById,
+} = require("./controllers/comments.controller");
 
 app.use(express.json());
 
@@ -28,13 +31,15 @@ app.post("/api/articles/:article_id/comments", postCommentById);
 
 app.patch("/api/articles/:article_id", patchArticlesVotes);
 
+app.delete("/api/comments/:comment_id", deleteCommentById);
+
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });
 });
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
-    res.status(400).send({ msg: "Bad request - Invalid input data type" });
+    res.status(400).send({ msg: "Bad request - invalid data type" });
   } else if (err.code === "23502") {
     res.status(400).send({ msg: "Invalid post body" });
   } else if (err.code === "23503") {
