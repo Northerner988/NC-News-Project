@@ -14,12 +14,15 @@ const {
   postCommentById,
   deleteCommentById,
 } = require("./controllers/comments.controller");
+const { getAllUsers } = require("./controllers/users.controller");
 
 app.use(express.json());
 
 app.get("/api", getAllEndpoints);
 
 app.get("/api/topics", getAllTopics);
+
+app.get("/api/users", getAllUsers);
 
 app.get("/api/articles", getAllArticles);
 
