@@ -15,13 +15,13 @@ afterAll(() => {
 });
 
 describe("GET /unavailable-endpoint", () => {
-  test("Status 404 - responds with unavailable endpoint requested", () => {
+  test("STATUS 404 - responds with unavailable endpoint requested", () => {
     return request(app).get("/api/not-an-endpoint").expect(404);
   });
 });
 
 describe("GET /api", () => {
-  test("Status 200 - responds with JSON describing all available endpoints", () => {
+  test("STATUS 200: responds with JSON describing all available endpoints", () => {
     return request(app)
       .get("/api")
       .expect(200)
@@ -32,28 +32,33 @@ describe("GET /api", () => {
 });
 
 describe("Get /api/topics", () => {
-  test("Status 200 - responds with an array of all topic objects ", () => {
+  test("STATUS 200: responds with an array of all topic objects ", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        expect(body.topics.length).toBe(3);
-        body.topics.forEach((topic) => {
-          expect(typeof topic.slug).toBe("string");
-          expect(typeof topic.description).toBe("string");
+        const { topics } = body;
+        expect(topics).toBeInstanceOf(Array);
+        expect(topics).toHaveLength(3);
+        topics.forEach((topic) => {
+          expect(topic).toMatchObject({
+            description: expect.any(String),
+            slug: expect.any(String),
+          });
         });
       });
   });
 });
 
 describe("Get /api/articles", () => {
-  test("Status 200 - responds with an array of all the article objects sorted by date in descending order. ", () => {
+  test("STATUS 200: responds with an array of all the article objects sorted by date, in descending order ", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles.length).toBe(12);
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(12);
         expect(articles).toBeSortedBy("created_at", {
           descending: true,
         });
@@ -76,33 +81,35 @@ describe("Get /api/articles", () => {
 });
 
 describe("GET /api/articles/:article_id", () => {
-  test("Status 200 - responds with the specified article object", () => {
+  test("STATUS 200: responds with an object for the specified article", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
       .then((response) => {
         const { article } = response.body;
-        expect(article.article_id).toBe(1);
-        expect(article.title).toBe("Living in the shadow of a great man");
-        expect(article.topic).toBe("mitch");
-        expect(article.author).toBe("butter_bridge");
-        expect(article.body).toBe("I find this existence challenging");
-        expect(article.created_at).toBe("2020-07-09T20:11:00.000Z");
-        expect(article.votes).toBe(100);
-        expect(article.article_img_url).toBe(
-          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-        );
+        expect(article).toBeInstanceOf(Object);
+        expect(article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
       });
   });
-  test("Status 400 - invalid article ID ", () => {
+  test("STATUS 400: invalid article ID format", () => {
     return request(app)
       .get("/api/articles/25Al")
       .expect(400)
       .then(({ body }) =>
-        expect(body.msg).toBe("Bad request - Invalid input data type")
+        expect(body.msg).toBe("Bad request - invalid data type")
       );
   });
-  test("Status 404 - valid but non-existent article ID", () => {
+  test("STATUS 404: valid but non-existent article ID", () => {
     return request(app)
       .get("/api/articles/99999")
       .expect(404)
@@ -113,13 +120,14 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
-  test("Status 200 - responds with the comments corresponding to the specified article, sorted by date in descending order", () => {
+  test("STATUS 200: responds with the comments corresponding to the specified article, sorted by date in descending order", () => {
     return request(app)
       .get("/api/articles/3/comments")
       .expect(200)
       .then((response) => {
         const { comments } = response.body;
-        expect(comments.length).toBe(2);
+        expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(2);
         expect(comments).toBeSortedBy("created_at", { descending: true });
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
@@ -132,7 +140,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
       });
   });
-  test("Status 200 - responds with an empty array for article that has no comments", () => {
+  test("STATUS 200: responds with an empty array for an article that has no comments", () => {
     return request(app)
       .get("/api/articles/2/comments")
       .expect(200)
@@ -141,27 +149,26 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(comments).toEqual([]);
       });
   });
-
-  test("Status 400 - invalid article ID ", () => {
+  test("STATUS 400: invalid article ID", () => {
     return request(app)
       .get("/api/articles/25Nonsense/comments")
       .expect(400)
       .then(({ body }) =>
-        expect(body.msg).toBe("Bad request - Invalid input data type")
+        expect(body.msg).toBe("Bad request - invalid data type")
       );
   });
-  test("Status 404 - valid but non-existent article ID", () => {
+  test("STATUS 404: valid but non-existent article ID", () => {
     return request(app)
       .get("/api/articles/99999/comments")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Article not found");
+        expect(body.msg).toBe("ID not found");
       });
   });
 });
 
-describe("Post /api/articles/:article_id/comments", () => {
-  test("Status 201 - responds with the newly added comment", () => {
+describe("POST /api/articles/:article_id/comments", () => {
+  test("STATUS 201: responds with the newly added comment", () => {
     const newComment = {
       username: "butter_bridge",
       body: "Just another random comment.",
@@ -171,7 +178,8 @@ describe("Post /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(201)
       .then(({ body }) => {
-        expect(body.comment).toEqual({
+        const { comment } = body;
+        expect(comment).toEqual({
           article_id: 3,
           author: "butter_bridge",
           body: "Just another random comment.",
@@ -181,7 +189,7 @@ describe("Post /api/articles/:article_id/comments", () => {
         });
       });
   });
-  test("Status 201 - addition of extra properties in post body are ignored ", () => {
+  test("STATUS 201: any additional properties in post body are ignored ", () => {
     const newComment = {
       username: "butter_bridge",
       body: "Just another random comment.",
@@ -203,10 +211,9 @@ describe("Post /api/articles/:article_id/comments", () => {
         });
       });
   });
-  test("Status 400 - missing properties from post body ", () => {
+  test("STATUS 400: missing required properties from post body ", () => {
     const newComment = {
       username: "butter_bridge",
-      body: null,
     };
     return request(app)
       .post("/api/articles/3/comments")
@@ -216,10 +223,10 @@ describe("Post /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Invalid post body");
       });
   });
-  test("Status 400 - properties in incorrect format ", () => {
+  test("STATUS 400: properties in incorrect format ", () => {
     const newComment = {
       username: "butter_bridge",
-      bodys: 19998,
+      wrongBody: "....i should not be here",
     };
     return request(app)
       .post("/api/articles/3/comments")
@@ -229,7 +236,7 @@ describe("Post /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Invalid post body");
       });
   });
-  test("Status 400 - invalid article ID ", () => {
+  test("STATUS 400: invalid article ID ", () => {
     const newComment = {
       username: "butter_bridge",
       body: "Just another random comment.",
@@ -239,10 +246,10 @@ describe("Post /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) =>
-        expect(body.msg).toBe("Bad request - Invalid input data type")
+        expect(body.msg).toBe("Bad request - invalid data type")
       );
   });
-  test("status 404 - valid but non-existent username ", () => {
+  test("STATUS 404: valid but non-existent username ", () => {
     const newComment = {
       username: "cool_dev",
       body: "Just another random comment.",
@@ -255,7 +262,7 @@ describe("Post /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Username not found");
       });
   });
-  test("Status 404 - valid but non-existent article ID", () => {
+  test("STATUS 404: valid but non-existent article ID", () => {
     const newComment = {
       username: "butter_bridge",
       body: "Just another random comment.",
@@ -265,14 +272,14 @@ describe("Post /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Article ID not found");
+        expect(body.msg).toBe("ID not found");
       });
   });
 });
 
 describe("PATCH /api/comments/:comment_id", () => {
-  const newVote = { inc_votes: 20 };
-  test("Status 200 - updates the given articles' votes and returns it", () => {
+  test("STATUS 200 - increments the given articles' votes and returns it", () => {
+    const newVote = { inc_votes: 20 };
     return request(app)
       .patch("/api/articles/1")
       .send(newVote)
@@ -291,7 +298,27 @@ describe("PATCH /api/comments/:comment_id", () => {
         });
       });
   });
-  test("Status 400 - incomplete request body ", () => {
+  test("STATUS 200: decrements the given articles' votes and returns it", () => {
+    const newVote = { inc_votes: -20 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVote)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          body: "I find this existence challenging",
+          votes: 80,
+          topic: "mitch",
+          author: "butter_bridge",
+          created_at: expect.any(String),
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("STATUS 400: incomplete request body ", () => {
     const newVote = {};
     return request(app)
       .patch("/api/articles/1")
@@ -301,34 +328,78 @@ describe("PATCH /api/comments/:comment_id", () => {
         expect(body.msg).toBe("Invalid post body");
       });
   });
-  test("Status 400 - invalid votes format ", () => {
+  test("STATUS 400: invalid votes format ", () => {
     const newVote = { inc_votes: "twenty" };
     return request(app)
       .patch("/api/articles/1")
       .send(newVote)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad request - Invalid input data type");
+        expect(body.msg).toBe("Bad request - invalid data type");
       });
   });
-  test("Status 400 - invalid article ID", () => {
+  test("STATUS 400: invalid article ID", () => {
     const newVote = { inc_votes: 20 };
     return request(app)
       .patch("/api/articles/25Nonsense")
       .send(newVote)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad request - Invalid input data type");
+        expect(body.msg).toBe("Bad request - invalid data type");
       });
   });
-  test("Status 404 - valid but non-existent article ID", () => {
+  test("STATUS 404: valid but non-existent article ID", () => {
     const newVote = { inc_votes: 20 };
     return request(app)
       .patch("/api/articles/99999")
       .send(newVote)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Article not found");
+        expect(body.msg).toBe("ID not found");
+      });
+  });
+  //****************************************************** */
+  test.skip("STATUS 200: returns unchanged article if no votes value has been provided", () => {
+    const newVote = {};
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newVote)
+      .expect(400)
+      .then(({ body }) => {
+        console.log(body);
+        expect(body.article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          body: "I find this existence challenging",
+          votes: 100,
+          topic: "mitch",
+          author: "butter_bridge",
+          created_at: expect.any(String),
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("STATUS 204: responds with no content when comment is successfully deleted ", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("STATUS 400: invalid comment ID", () => {
+    return request(app)
+      .delete("/api/comments/1Nonsense")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request - invalid data type");
+      });
+  });
+  test("STATUS 404: valid but non-existent comment ID ", () => {
+    return request(app)
+      .delete("/api/comments/99999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Comment ID not found");
       });
   });
 });
