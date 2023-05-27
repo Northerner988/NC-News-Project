@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const { checkArticleExists, checkCommentExists } = require("../db/seeds/utils");
+const { checkCommentExists } = require("../db/seeds/utils");
 
 exports.removeCommentById = (comment_id) => {
   return checkCommentExists(comment_id).then(() => {
