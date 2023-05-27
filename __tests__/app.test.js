@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const allEndPoints = require("../endpoints.json");
-const users = require("../db/data/test-data/users.js");
 require("jest-sorted");
 
 beforeEach(() => {
@@ -72,7 +71,7 @@ describe("GET /api/users", () => {
 });
 
 describe("Get /api/articles", () => {
-  test("STATUS 200: responds with an array of all the article objects sorted by date, in descending order ", () => {
+  test("STATUS 200: responds with an array of all the article objects, by default sorted by date in descending order ", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -96,6 +95,52 @@ describe("Get /api/articles", () => {
             article_img_url: expect.any(String),
             comment_count: expect.any(Number),
           });
+        });
+      });
+  });
+  test("STATUS 200: responds with an array of all the article objects in ascending order when order is specified", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toBeSortedBy("created_at", {
+          descending: false,
+        });
+      });
+  });
+
+  test("STATUS 200: responds with an array of all the article object with the specified topic property", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((response) => {
+        const { articles } = response.body;
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+
+  test("STATUS 200: responds with an array of articles sorted by the specified column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("author", { descending: true });
+      });
+  });
+  test("STATUS 200: responds with an array of articles with the specified topic, order and column", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=author&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("author", { descending: false });
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
         });
       });
   });
@@ -319,8 +364,8 @@ describe("PATCH /api/comments/:comment_id", () => {
         });
       });
   });
-  test("STATUS 200: decrements the given articles' votes and returns it", () => {
-    const newVote = { inc_votes: -20 };
+  test("STATUS 200: returns unchanged article if no votes value has been provided", () => {
+    const newVote = { inc_votes: 0 };
     return request(app)
       .patch("/api/articles/1")
       .send(newVote)
@@ -330,7 +375,7 @@ describe("PATCH /api/comments/:comment_id", () => {
           article_id: 1,
           title: "Living in the shadow of a great man",
           body: "I find this existence challenging",
-          votes: 80,
+          votes: 100,
           topic: "mitch",
           author: "butter_bridge",
           created_at: expect.any(String),
