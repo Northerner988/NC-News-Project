@@ -453,6 +453,83 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
+describe("PATCH /api/comments/:comment_id", () => {
+  test("STATUS 200 - increments the given comments' votes and returns it", () => {
+    const newVote = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(newVote)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment).toMatchObject({
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          article_id: 9,
+          author: "butter_bridge",
+          votes: 26,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("STATUS 200 - increments the given comments' votes and returns it", () => {
+    const newVote = { inc_votes: -10 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(newVote)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment).toMatchObject({
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          article_id: 9,
+          author: "butter_bridge",
+          votes: 6,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("STATUS 400: incomplete request body ", () => {
+    const newVote = {};
+    return request(app)
+      .patch("/api/comments/1")
+      .send(newVote)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid post body");
+      });
+  });
+  test("STATUS 400: invalid votes format ", () => {
+    const newVote = { inc_votes: "five" };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(newVote)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request - invalid data type");
+      });
+  });
+  test("STATUS 400: invalid comment ID", () => {
+    const newVote = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/articles/25Nonsense")
+      .send(newVote)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request - invalid data type");
+      });
+  });
+  test("STATUS 404: valid but non-existent comment ID", () => {
+    const newVote = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/comments/99999")
+      .send(newVote)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Comment ID not found");
+      });
+  });
+});
+
 describe("DELETE /api/comments/:comment_id", () => {
   test("STATUS 204: responds with no content when comment is successfully deleted ", () => {
     return request(app).delete("/api/comments/1").expect(204);
