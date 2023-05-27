@@ -93,6 +93,22 @@ exports.fetchCommentsById = (article_id) => {
     });
 };
 
+exports.insertCommentById = (article_id, username, body) => {
+  return checkArticleExists(article_id).then(() => {
+    return db
+      .query(
+        `
+    INSERT INTO comments (article_id, author, body)
+    VALUES ($1, $2, $3) RETURNING *;
+    `,
+        [article_id, username, body]
+      )
+      .then((result) => {
+        return result.rows[0];
+      });
+  });
+};
+
 exports.updateArticlesVotes = (article_id, inc_votes) => {
   return checkArticleExists(article_id)
     .then(() => {
