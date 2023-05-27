@@ -70,6 +70,32 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/users/:username", () => {
+  test("STATUS 200: responds with an object for the specified user", () => {
+    return request(app)
+      .get("/api/users/rogersop")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toBeInstanceOf(Object);
+        expect(users).toEqual({
+          username: "rogersop",
+          name: "paul",
+          avatar_url:
+            "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+        });
+      });
+  });
+  test("STATUS 404: valid but non-existent user", () => {
+    return request(app)
+      .get("/api/users/nonexistent_user")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Username not found");
+      });
+  });
+});
+
 describe("Get /api/articles", () => {
   test("STATUS 200: responds with an array of all the article objects, by default sorted by date in descending order ", () => {
     return request(app)
