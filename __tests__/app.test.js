@@ -370,7 +370,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
-describe("PATCH /api/comments/:comment_id", () => {
+describe("PATCH /api/articles/:article_id", () => {
   test("STATUS 200 - increments the given articles' votes and returns it", () => {
     const newVote = { inc_votes: 20 };
     return request(app)
@@ -391,8 +391,8 @@ describe("PATCH /api/comments/:comment_id", () => {
         });
       });
   });
-  test("STATUS 200: returns unchanged article if no votes value has been provided", () => {
-    const newVote = { inc_votes: 0 };
+  test("STATUS 200 - decrements the given articles' votes and returns it", () => {
+    const newVote = { inc_votes: -20 };
     return request(app)
       .patch("/api/articles/1")
       .send(newVote)
@@ -402,7 +402,7 @@ describe("PATCH /api/comments/:comment_id", () => {
           article_id: 1,
           title: "Living in the shadow of a great man",
           body: "I find this existence challenging",
-          votes: 100,
+          votes: 80,
           topic: "mitch",
           author: "butter_bridge",
           created_at: expect.any(String),
