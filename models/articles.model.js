@@ -16,26 +16,58 @@ exports.fetchArticleById = (articleId) => {
     });
 };
 
-exports.fetchAllArticles = () => {
-  return db
-    .query(
-      `SELECT 
-  articles.article_id, 
-  articles.title, 
-  articles.author, 
-  articles.topic, 
-  articles.created_at, 
-  articles.votes, 
-  articles.article_img_url, 
-  CAST(COUNT(comments.comment_id) AS INT) AS comment_count
-  FROM articles
-  LEFT JOIN comments ON articles.article_id = comments.article_id
-  GROUP BY articles.article_id
-  ORDER BY articles.created_at DESC;`
-    )
-    .then((result) => {
-      return result.rows;
+exports.fetchAllArticles = (sort_by = "created_at", topic, order = "desc") => {
+  const validSortBy = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "comment_count",
+  ];
+
+  const validOrder = ["asc", "desc"];
+
+  if (!validSortBy.includes(sort_by) || !validOrder.includes(order)) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid query",
     });
+  }
+
+  let sqlStr = `SELECT
+    articles.article_id,
+    articles.title,
+    articles.author,
+    articles.topic,
+    articles.created_at,
+    articles.votes,
+    articles.article_img_url,
+    CAST(COUNT(comments.comment_id) AS INT) AS comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id`;
+
+  const queryParams = [];
+
+  if (topic) {
+    sqlStr += ` WHERE articles.topic = $1`;
+    queryParams.push(topic);
+  }
+
+  sqlStr += ` GROUP BY articles.article_id`;
+
+  if (sort_by) {
+    sqlStr += ` ORDER BY ${sort_by}`;
+  }
+
+  if (order === "asc" || order === "desc") {
+    sqlStr += ` ${order.toUpperCase()};`;
+  }
+
+  return db.query(sqlStr, queryParams).then((result) => {
+    return result.rows;
+  });
 };
 
 exports.fetchCommentsById = (article_id) => {
