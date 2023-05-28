@@ -50,6 +50,57 @@ describe("Get /api/topics", () => {
   });
 });
 
+describe("POST /api/topics", () => {
+  test("STATUS 201: responds with the newly added topic", () => {
+    const newTopic = {
+      slug: "watermelons",
+      description: "The best fruit",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(201)
+      .then(({ body }) => {
+        const { topic } = body;
+        expect(topic).toEqual({
+          slug: "watermelons",
+          description: "The best fruit",
+        });
+      });
+  });
+  test("STATUS 201: any additional properties in post body are ignored ", () => {
+    const newTopic = {
+      slug: "watermelons",
+      description: "The best fruit",
+      extra: "This property will be ignored",
+      anotherExtra: "This property will also be ignored",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(201)
+      .then(({ body }) => {
+        const { topic } = body;
+        expect(topic).toEqual({
+          slug: "watermelons",
+          description: "The best fruit",
+        });
+      });
+  });
+  test("STATUS 400: missing required properties from post body ", () => {
+    const newTopic = {
+      slug: "watermelons",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing required fields");
+      });
+  });
+});
+
 describe("GET /api/users", () => {
   test("STATUS 200: responds with an array of all the users objects ", () => {
     return request(app)
@@ -446,6 +497,28 @@ describe("PATCH /api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/99999")
       .send(newVote)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("ID not found");
+      });
+  });
+});
+
+describe("DELETE /api/articles/:article_id", () => {
+  test("STATUS 204: responds with no content when article is successfully deleted ", () => {
+    return request(app).delete("/api/articles/5").expect(204);
+  });
+  test("STATUS 400: invalid article ID", () => {
+    return request(app)
+      .delete("/api/articles/1Nonsense")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request - invalid data type");
+      });
+  });
+  test("STATUS 404: valid but non-existent article ID ", () => {
+    return request(app)
+      .delete("/api/articles/99999")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("ID not found");
